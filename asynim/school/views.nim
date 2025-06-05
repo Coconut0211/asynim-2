@@ -212,14 +212,34 @@ proc formPersonView*(person: string): Future[string] {.async.} =
     content
   )
 
-
 template schoolApiView*() =
-  ## Исправьте заглушку
-  ## Эндпоинт должен отдавать JsonNode:
-  ## - {"director": JObject[id, lastname}
-  ## - {"teacher": JArray[JObject[id, lastname]]}
-  ## - {"student": JArray[JObject[id, lastname]]}
-  resp %*{"message": "Заглушка API для проекта школы"}
+  var content: JsonNode = newJObject()
+  let director = dbSchool.selectAll(Director)[^1]
+  let teachers = dbSchool.selectAll(Teacher)
+  let students = dbSchool.selectAll(Student)
+  content["director"] = %*{"id": director.id, "lastname": director.lastname}
+  content["teachers"] = %* teachers.mapIt(%*{"id": it.id, "lastname": it.lastname})
+  content["students"] = %* students.mapIt(%*{"id": it.id, "lastname": it.lastname})
+  resp content
 
-## Реализуйте представления для API учителей, студентов и директора
-## Начать с директора будет проще всего
+template detailDirectorApiView*() =
+  var content: JsonNode = newJObject()
+  let item = dbSchool.select(Director, "Director.id = ?", 1)[0]
+  content = %* item
+  content["birthDate"] = %* item.birthDate.toStr
+  resp content
+  
+template detailPersonApiView*(person, personId: string) = 
+  var content: JsonNode = newJObject()
+  if person == "teacher":
+    let item = dbSchool.select(Teacher, "Teacher.id = ?", personId.parseInt)[0]
+    content["firstname"] = %* item.firstname
+    content["lastname"] = %* item.lastname
+    content["birthDate"] = %* item.birthDate.toStr
+    content["subject"] = %* item.subject
+    content["id"] = %* item.id
+  elif person == "student":
+    let item = dbSchool.select(Student, "Student.id = ?", personId.parseInt)[0]
+    content = %* item
+    content["birthDate"] = %* item.birthDate.toStr 
+  resp content
