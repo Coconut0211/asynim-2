@@ -30,3 +30,24 @@ proc detailShopObjectApiView*(db: DbConn, section, objectId: string): Future[Jso
   elif section == "cash":
     let item = db.select(Cash, "Cash.id = ?", objectId.parseInt)[0]
     result = %* item
+
+template createShopObjectApiView*(): untyped =
+  let data = request.body.parseJson
+  if data.hasKey("birthDate"):
+    data["birthDate"] = %(data["birthDate"].getStr.toUnix)
+  if data.hasKey("endDate"):
+    data["endDate"] = %(data["endDate"].getStr.toUnix)
+  case @"section":
+  of "cash":
+    data["id"] = %(dbShop.count(Cash) + 1)
+    var item = data.to(Cash)
+    dbShop.insert(item, force=true)
+  of "staff":
+    data["id"] = %(dbShop.count(Staff) + 1)
+    var item = data.to(Staff)
+    dbShop.insert(item, force=true)
+  of "good":
+    data["id"] = %(dbShop.count(Good) + 1)
+    var item = data.to(Good)
+    dbShop.insert(item, force=true)
+  %*{"status": "OK"}

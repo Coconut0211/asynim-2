@@ -150,6 +150,7 @@ template updateDirectorView*(): untyped =
 
 template createPersonView*(): untyped =
   let data = request.body.parseJson
+  echo data.pretty(4)
   data["birthDate"] = %(data["birthDate"].getStr.toUnix)
   case @"person":
   of "teacher":

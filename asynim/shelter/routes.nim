@@ -7,3 +7,6 @@ template shelterRoutes*() =
       get "/api/v1/shelter/@section/@id":
         cond @"section" in ["manager", "staff", "pet"]
         resp await detailShelterObjectApiView(dbShelter, @"section", @"id")
+      post "/api/v1/shelter/@section/create":
+        cond @"section" in ["manager", "staff", "pet"]
+        resp createShelterObjectApiView()

@@ -18,21 +18,21 @@ template baseApiView*() =
   }
 
 template notFoundView*() =
-  resp await getContent(
+  resp(Http404, await getContent(
     title("404"),
     h1("Страница не найдена :(", class="text-danger"),
     `div`(
       a("На главную", href="/", class="btn btn-outline-light"),
       class="text-center"
     )
-  )
+  ))
 
 template deniedView*() =
-  resp await getContent(
+  resp(Http403, await getContent(
     title("403"),
     h1("Действие запрещено", class="text-danger"),
     `div`(
       a("На главную", href="/", class="btn btn-outline-light"),
       class="text-center"
     )
-  )
+  ))

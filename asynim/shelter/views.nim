@@ -30,3 +30,22 @@ proc detailShelterObjectApiView*(db: DbConn, section, objectId: string): Future[
   elif section == "pet":
     let item = db.select(Pet, "Pet.id = ?", objectId.parseInt)[0]
     result = %* item
+
+template createShelterObjectApiView*(): untyped =
+  let data = request.body.parseJson
+  if data.hasKey("birthDate"):
+    data["birthDate"] = %(data["birthDate"].getStr.toUnix)
+  case @"section":
+  of "manager":
+    data["id"] = %(dbShelter.count(Manager) + 1)
+    var item = data.to(Manager)
+    dbShelter.insert(item, force=true)
+  of "staff":
+    data["id"] = %(dbShelter.count(Staff) + 1)
+    var item = data.to(Staff)
+    dbShelter.insert(item, force=true)
+  of "pet":
+    data["id"] = %(dbShelter.count(Pet) + 1)
+    var item = data.to(Pet)
+    dbShelter.insert(item, force=true)
+  %*{"status": "OK"}
