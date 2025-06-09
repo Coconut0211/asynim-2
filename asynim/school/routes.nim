@@ -21,3 +21,13 @@ template schoolRoutes*() =
       resp await detailPersonView(dbSchool, @"person", @"id")
     get "/api/v1/school":
       schoolApiView()
+    get "/api/v1/school/director":
+      detailDirectorApiView()
+    get "/api/v1/school/@person/@id":
+      cond @"person" in ["teacher", "student"]
+      detailPersonApiView(@"person", @"id")
+    post "/api/v1/school/@person/create":
+      cond @"person" in ["teacher", "student"]
+      resp createPersonView()
+    post "/api/v1/school/director/update":
+      resp updateDirectorView()

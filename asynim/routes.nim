@@ -1,5 +1,6 @@
 import school/routes
-## Импортируйте роуты остальных подпроектов
+import shop/routes
+import shelter/routes
 import views
 
 template baseRoutes*() =
@@ -16,4 +17,5 @@ template baseRoutes*() =
 template getRoutes*() =
   baseRoutes()
   schoolRoutes()
-  ## Не забудьте зарегистрировать роуты здесь
+  shopRoutes()
+  shelterRoutes()
